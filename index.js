@@ -1,6 +1,7 @@
 const Schema = require('./schema');
 const { graphql } = require('graphql');
 const express = require('express');
+const bodyParser = require('body-parser');
 const cors = require('cors');
 const graphQLHTTP = require('express-graphql');
 const mongoose = require('mongoose');
@@ -18,6 +19,8 @@ const corsOptions = {
   credentials: true,
 };
 app.use(cors(corsOptions));
+
+app.use(bodyParser.json());
 
 const allowCrossDomain = (req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');

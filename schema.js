@@ -5,7 +5,7 @@ const userType = new graphql.GraphQLObjectType({
   name: 'user',
   fields: () => ({
     id: {
-      type: graphql.GraphQLString,
+      type: graphql.GraphQLID,
     },
     name: {
       type: graphql.GraphQLString,
@@ -56,6 +56,7 @@ const MutationAdd = {
       name: args.name,
       address: args.address,
     });
+    newUser.id = newUser._id;
     return new Promise((resolve, reject) => {
       newUser.save(err => {
         if (err) reject(err);
@@ -65,10 +66,29 @@ const MutationAdd = {
   },
 };
 
+const MutationDelete = {
+  type: userType,
+  args: {
+    id: {
+      id: 'id',
+      type: new graphql.GraphQLNonNull(graphql.GraphQLID),
+    },
+  },
+  resolve: (root, args) => {
+    return new Promise((resolve, reject) => {
+      USER.findByIdAndRemove(args.id, err => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+  },
+};
+
 const MutationType = new graphql.GraphQLObjectType({
   name: 'Mutation',
   fields: {
     add: MutationAdd,
+    delete: MutationDelete,
   },
 });
 
