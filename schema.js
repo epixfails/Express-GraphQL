@@ -106,10 +106,15 @@ const MutationUpdate = {
       address: args.address,
     };
     return new Promise((resolve, reject) => {
-      USER.findOneAndUpdate(args.id, updatedUser, { upsert: true }, err => {
-        if (err) reject(err);
-        else resolve();
-      });
+      USER.findOneAndUpdate(
+        { id: args.id },
+        { $set: { ...updatedUser } },
+        { upsert: true },
+        err => {
+          if (err) console.log(err);
+          else resolve();
+        },
+      );
     });
   },
 };
