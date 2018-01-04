@@ -84,11 +84,42 @@ const MutationDelete = {
   },
 };
 
+const MutationUpdate = {
+  type: userType,
+  args: {
+    id: {
+      id: 'id',
+      type: new graphql.GraphQLNonNull(graphql.GraphQLID),
+    },
+    name: {
+      name: 'name',
+      type: new graphql.GraphQLNonNull(graphql.GraphQLString),
+    },
+    address: {
+      address: 'address',
+      type: new graphql.GraphQLNonNull(graphql.GraphQLString),
+    },
+  },
+  resolve: (root, args) => {
+    const updatedUser = {
+      name: args.name,
+      address: args.address,
+    };
+    return new Promise((resolve, reject) => {
+      USER.findOneAndUpdate(args.id, updatedUser, { upsert: true }, err => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+  },
+};
+
 const MutationType = new graphql.GraphQLObjectType({
   name: 'Mutation',
   fields: {
     add: MutationAdd,
     delete: MutationDelete,
+    update: MutationUpdate,
   },
 });
 
