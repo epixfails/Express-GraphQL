@@ -13,6 +13,9 @@ const noteType = new graphql.GraphQLObjectType({
     content: {
       type: graphql.GraphQLString,
     },
+    date_updated: {
+      type: graphql.GraphQLString,
+    },
   }),
 });
 
