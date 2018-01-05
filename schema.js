@@ -1,37 +1,38 @@
 const graphql = require('graphql');
 const mongoose = require('mongoose');
 
-const userType = new graphql.GraphQLObjectType({
-  name: 'user',
+const noteType = new graphql.GraphQLObjectType({
+  name: 'note',
   fields: () => ({
     id: {
       type: graphql.GraphQLID,
     },
-    name: {
+    title: {
       type: graphql.GraphQLString,
     },
-    address: {
+    content: {
       type: graphql.GraphQLString,
     },
   }),
 });
 
-const USER = mongoose.model('users', {
+const NOTE = mongoose.model('notes', {
   id: mongoose.Schema.Types.ObjectId,
-  name: String,
-  address: String,
+  title: String,
+  content: String,
+  date_updated: { type: Date, default: Date.now },
 });
 
 const queryType = new graphql.GraphQLObjectType({
-  name: 'User',
+  name: 'Note',
   fields: () => ({
-    users: {
-      type: new graphql.GraphQLList(userType),
+    notes: {
+      type: new graphql.GraphQLList(noteType),
       resolve: () =>
         new Promise((resolve, reject) => {
-          USER.find((err, users) => {
+          NOTE.find((err, notes) => {
             if (err) reject(err);
-            else resolve(users);
+            else resolve(notes);
           });
         }),
     },
@@ -39,35 +40,35 @@ const queryType = new graphql.GraphQLObjectType({
 });
 
 const MutationAdd = {
-  type: userType,
-  description: 'add User',
+  type: noteType,
+  description: 'add Note',
   args: {
-    name: {
-      name: 'name',
+    title: {
+      name: 'title',
       type: new graphql.GraphQLNonNull(graphql.GraphQLString),
     },
-    address: {
-      address: 'address',
+    content: {
+      content: 'content',
       type: new graphql.GraphQLNonNull(graphql.GraphQLString),
     },
   },
   resolve: (root, args) => {
-    const newUser = new USER({
-      name: args.name,
-      address: args.address,
+    const newNote = new NOTE({
+      title: args.title,
+      content: args.content,
     });
-    newUser.id = newUser._id;
+    newNote.id = newNote._id;
     return new Promise((resolve, reject) => {
-      newUser.save(err => {
+      newNote.save(err => {
         if (err) reject(err);
-        else resolve(newUser);
+        else resolve(newNote);
       });
     });
   },
 };
 
 const MutationDelete = {
-  type: userType,
+  type: noteType,
   args: {
     id: {
       id: 'id',
@@ -76,7 +77,7 @@ const MutationDelete = {
   },
   resolve: (root, args) => {
     return new Promise((resolve, reject) => {
-      USER.findByIdAndRemove(args.id, err => {
+      NOTE.findByIdAndRemove(args.id, err => {
         if (err) reject(err);
         else resolve();
       });
@@ -85,30 +86,30 @@ const MutationDelete = {
 };
 
 const MutationUpdate = {
-  type: userType,
+  type: noteType,
   args: {
     id: {
       id: 'id',
       type: new graphql.GraphQLNonNull(graphql.GraphQLID),
     },
-    name: {
-      name: 'name',
+    title: {
+      title: 'title',
       type: new graphql.GraphQLNonNull(graphql.GraphQLString),
     },
-    address: {
-      address: 'address',
+    content: {
+      content: 'content',
       type: new graphql.GraphQLNonNull(graphql.GraphQLString),
     },
   },
   resolve: (root, args) => {
-    const updatedUser = {
-      name: args.name,
-      address: args.address,
+    const updatedNote = {
+      title: args.title,
+      content: args.content,
     };
     return new Promise((resolve, reject) => {
-      USER.findOneAndUpdate(
+      NOTE.findOneAndUpdate(
         { id: args.id },
-        { $set: { ...updatedUser } },
+        { $set: { ...updatedNote } },
         { upsert: true },
         err => {
           if (err) console.log(err);
