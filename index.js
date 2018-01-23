@@ -1,12 +1,11 @@
 const Schema = require('./schema');
-const { graphql } = require('graphql');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const graphQLHTTP = require('express-graphql');
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://<DB_USER>:<DB_USER_PASSWORD>@<DB_URI>');
+mongoose.connect('mongodb://<USER>:<PASSSW>@<DB>');
 
 const port = process.env.PORT || 8080;
 const app = express();
